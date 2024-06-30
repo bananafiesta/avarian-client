@@ -1,4 +1,4 @@
-import {Route, Routes} from "react-router-dom";
+import {Route, Routes, Navigate} from "react-router-dom";
 
 import MainHome from "./MainHome";
 import MCHome from "./MCHome";
@@ -8,6 +8,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<MainHome />}/>
       <Route path="/mc/" element={<MCHome />}/>
+      <Route path="*" element={<Navigate to="/" replace={true}/>}/>
     </Routes>
   );
 }
