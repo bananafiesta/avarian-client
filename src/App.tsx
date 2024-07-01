@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import AppRoutes from './components/AppRoutes'
 
 function App(): React.ReactNode {
