@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import React from "react";
 import Navbutton from "./Navbutton";
 
-function Navbar() {
+function Navbar(): React.ReactNode {
   return (
     <div>
       <nav className="bg-[#540000] top-0 py-2">
