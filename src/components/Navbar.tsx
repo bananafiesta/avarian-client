@@ -18,6 +18,13 @@ function Navbar(): React.ReactNode {
             {/* drop down items */}
             <div className="flex flex-grow justify-start px-2 relative">
               
+              <Menu>
+                <MenuButton>
+                  Games
+
+                </MenuButton>
+              </Menu>
+
               <Navbutton>
                 Games
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" className="h-5 w-5 text-white" fill="currentColor" aria-hidden="true">
