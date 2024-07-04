@@ -1,10 +1,10 @@
 import {Route, Routes, Navigate} from "react-router-dom";
 
-import MainHome from "./MainHome";
-import MCHome from "./MCHome";
+import {MainHome} from "./MainHome";
+import {MCHome} from "./MCHome";
 import React from "react";
 
-function AppRoutes(): React.ReactNode {
+export function AppRoutes(): React.ReactNode {
   return (
     <Routes>
       <Route path="/" element={<MainHome />}/>
@@ -13,5 +13,3 @@ function AppRoutes(): React.ReactNode {
     </Routes>
   );
 }
-
-export default AppRoutes;

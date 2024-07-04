@@ -1,6 +1,6 @@
-import AppRoutes from './components/AppRoutes'
+import {AppRoutes} from './components/AppRoutes'
 
-function App(): React.ReactNode {
+export function App(): React.ReactNode {
   return (
     <>
       <AppRoutes />
@@ -8,4 +8,4 @@ function App(): React.ReactNode {
   )
 }
 
-export default App
+

@@ -1,9 +1,9 @@
 import React from "react";
-import Navbar from "./Navbar";
+import {Navbar} from "./Navbar";
 import { Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
 import { Link } from "react-router-dom";
 
-function MainHome(): React.ReactNode {
+export function MainHome(): React.ReactNode {
   return (
     <div className="bg-[url('/rugged_highlands.jpg')] h-screen bg-cover">
       <Navbar>
@@ -30,5 +30,3 @@ function MainHome(): React.ReactNode {
     </div>
   );
 }
-
-export default MainHome;

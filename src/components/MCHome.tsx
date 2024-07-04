@@ -1,7 +1,7 @@
 import React from "react";
-import Navbar from "./Navbar";
+import {Navbar} from "./Navbar";
 
-function MCHome(): React.ReactNode {
+export function MCHome(): React.ReactNode {
   return (
     <div>
       <Navbar>
@@ -12,4 +12,3 @@ function MCHome(): React.ReactNode {
   )
 }
 
-export default MCHome;

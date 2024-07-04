@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import React from "react";
 
-function Navbar({children}: {children?: React.ReactNode}): React.ReactNode {
+export function Navbar({children}: {children?: React.ReactNode}): React.ReactNode {
   return (
     <div>
       <nav className="bg-[#540000] top-0 py-2">
@@ -30,4 +30,3 @@ function Navbar({children}: {children?: React.ReactNode}): React.ReactNode {
   );
 }
 
-export default Navbar;
