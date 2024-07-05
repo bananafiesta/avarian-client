@@ -20,7 +20,9 @@ export function Navbar({children}: {children?: React.ReactNode}): React.ReactNod
 
             {/* Login stuff on right side */}
             <div className="">
-              <a href="/" className="block">Login</a>
+              <Link to="/login/">
+                Login
+              </Link>
             </div>
 
           </div>
