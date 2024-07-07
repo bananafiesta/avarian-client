@@ -2,8 +2,11 @@ import React from "react";
 import {Navbar} from "./Navbar";
 import { Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
 import { Link } from "react-router-dom";
+import { useDocumentTitle } from "./useDocumentTitle";
 
 export function MainHome(): React.ReactNode {
+  const title = "Avarian - Now with less bugs!"
+  useDocumentTitle(title);
   return (
     <div className="bg-[url('/rugged_highlands.jpg')] h-screen bg-cover">
       <Navbar>
