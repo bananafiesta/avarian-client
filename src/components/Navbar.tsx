@@ -1,8 +1,75 @@
 import { Link } from "react-router-dom";
-import { Button } from "@headlessui/react";
-import React from "react";
+import { Button, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { firebaseAuth } from "./firebase";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import React, { useState, ReactNode, useCallback } from "react";
 
-export function Navbar({children}: {children?: React.ReactNode}): React.ReactNode {
+function ProfileDropdown(displayName: string, photoUrl: string, funcSignOut: () => void): ReactNode {
+  return (
+    <Menu>
+      <MenuButton className="flex hover:bg-white/10 px-3 py-2 rounded-xl text-white items-center gap-2 text-lg">
+        <img src={photoUrl} alt="Profile Picture" className="rounded-full h-12 border-2 border-white/10"/>
+        {displayName}
+      </MenuButton>
+      <MenuItems anchor="bottom end" transition className="flex flex-col font-lg bg-black/50 text-white backdrop-blur-sm p-1 rounded-xl origin-center transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0 [--anchor-gap:8px] min-w-[var(--button-width)]">
+        <MenuItem disabled>
+          <Link to="/profile" className="flex grow items-center rounded-md p-2 gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            </svg>
+            <span className="line-through decoration-2">Profile</span>
+          </Link>
+        </MenuItem>
+        <div className="my-1 h-px bg-white/5" />
+        <MenuItem>
+          <Button className="flex grow items-center rounded-md hover:bg-white/10 p-2 gap-2" onClick={funcSignOut}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+            </svg>
+            Sign Out
+          </Button>
+        </MenuItem>
+      </MenuItems>
+    </Menu>
+  )
+}
+
+function SignIn(): ReactNode {
+  return (
+    <Link to="/login/">
+      <Button className="flex hover:bg-white/10 px-3 py-2 rounded-xl text-white items-center text-lg gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+        </svg>
+        Sign In
+      </Button>
+    </Link>
+  )
+}
+
+export function Navbar({children}: {children?: ReactNode}): ReactNode {
+  const [loggedIn, setLoggedIn]: [boolean, (arg0: boolean) => void] = useState(false);
+  const [displayName, setDisplayName]: [string, (arg0: string) => void] = useState("");
+  const [photoUrl, setPhotoUrl]: [string, (arg0: string) => void] = useState("");
+  onAuthStateChanged(firebaseAuth, (user) => {
+    if (user && user.displayName !== null && user.photoURL !== null) {
+      setLoggedIn(true);
+      setDisplayName(user.displayName);
+      setPhotoUrl(user.photoURL);
+    } else {
+      setLoggedIn(false);
+    }
+  });
+  const funcSignOut: () => void = useCallback(() => {
+    signOut(firebaseAuth).then(() => {
+      setLoggedIn(false);
+      setDisplayName("");
+      setPhotoUrl("");
+    }).catch(() => {
+
+    });
+  }, [])
+
   return (
     <nav className="bg-[#540000] top-0 py-2">
         
@@ -20,9 +87,7 @@ export function Navbar({children}: {children?: React.ReactNode}): React.ReactNod
 
           {/* Login stuff on right side */}
           <div className="">
-            <Link to="/login/">
-              Login
-            </Link>
+            {loggedIn ? ProfileDropdown(displayName, photoUrl, funcSignOut) : SignIn()}
           </div>
 
         </div>
