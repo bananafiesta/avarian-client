@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { firebaseAuth } from "./firebase";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import React, { useState, ReactNode, useCallback } from "react";
+import { useState, ReactNode, useCallback, useEffect } from "react";
+import { supabase } from "./supabase";
+import { User, UserIdentity } from "@supabase/supabase-js";
 
 function ProfileDropdown(displayName: string, photoUrl: string, funcSignOut: () => void): ReactNode {
   return (
@@ -36,7 +36,7 @@ function ProfileDropdown(displayName: string, photoUrl: string, funcSignOut: () 
 
 function SignIn(): ReactNode {
   return (
-    <Link to="/login/">
+    <Link to="/login/" state={{ prevUrl: `${location.origin}${location.pathname}` }}>
       <Button className="flex hover:bg-white/10 px-3 py-2 rounded-xl text-white items-center text-lg gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
@@ -51,17 +51,10 @@ export function Navbar({children}: {children?: ReactNode}): ReactNode {
   const [loggedIn, setLoggedIn]: [boolean, (arg0: boolean) => void] = useState(false);
   const [displayName, setDisplayName]: [string, (arg0: string) => void] = useState("");
   const [photoUrl, setPhotoUrl]: [string, (arg0: string) => void] = useState("");
-  onAuthStateChanged(firebaseAuth, (user) => {
-    if (user && user.displayName !== null && user.photoURL !== null) {
-      setLoggedIn(true);
-      setDisplayName(user.displayName);
-      setPhotoUrl(user.photoURL);
-    } else {
-      setLoggedIn(false);
-    }
-  });
+
   const funcSignOut: () => void = useCallback(() => {
-    signOut(firebaseAuth).then(() => {
+
+    supabase.auth.signOut().then(() => {
       setLoggedIn(false);
       setDisplayName("");
       setPhotoUrl("");
@@ -69,6 +62,30 @@ export function Navbar({children}: {children?: ReactNode}): ReactNode {
 
     });
   }, [])
+
+  useEffect(() => {
+    const userHelper = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error === null && data.session !== null) {
+        const user: User = data.session.user;
+        setLoggedIn(true);
+
+        // Prioritize discord login if multiple identities present
+        const discordIdentity: UserIdentity | undefined = user.identities?.find((identity) => identity.provider === 'discord');
+        if (discordIdentity !== undefined && discordIdentity.identity_data !== undefined) {
+          setDisplayName(discordIdentity.identity_data.full_name);
+          setPhotoUrl(discordIdentity.identity_data.picture);
+        } else {
+          const googleIdentity: UserIdentity | undefined = user.identities?.find((identity) => identity.provider === 'google');
+          if (googleIdentity !== undefined && googleIdentity.identity_data !== undefined) {
+            setDisplayName(googleIdentity.identity_data.full_name);
+            setPhotoUrl(googleIdentity.identity_data.picture);
+          }
+        }
+      }
+    }
+    userHelper();
+  })
 
   return (
     <nav className="bg-[#540000] top-0 py-2">
