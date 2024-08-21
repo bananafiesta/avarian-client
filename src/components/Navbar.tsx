@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Button, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { Button, Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react";
 import { useState, ReactNode, useCallback, useEffect } from "react";
 import { supabase } from "./supabase";
 import { User, UserIdentity } from "@supabase/supabase-js";
@@ -51,6 +51,7 @@ export function Navbar({children}: {children?: ReactNode}): ReactNode {
   const [loggedIn, setLoggedIn]: [boolean, (arg0: boolean) => void] = useState(false);
   const [displayName, setDisplayName]: [string, (arg0: string) => void] = useState("");
   const [photoUrl, setPhotoUrl]: [string, (arg0: string) => void] = useState("");
+  const [identityChecked, setIdentityChecked]: [boolean, (arg0: boolean) => void] = useState(false);
 
   const funcSignOut: () => void = useCallback(() => {
 
@@ -75,14 +76,15 @@ export function Navbar({children}: {children?: ReactNode}): ReactNode {
         if (discordIdentity !== undefined && discordIdentity.identity_data !== undefined) {
           setDisplayName(discordIdentity.identity_data.full_name);
           setPhotoUrl(discordIdentity.identity_data.picture);
-        } else {
-          const googleIdentity: UserIdentity | undefined = user.identities?.find((identity) => identity.provider === 'google');
-          if (googleIdentity !== undefined && googleIdentity.identity_data !== undefined) {
-            setDisplayName(googleIdentity.identity_data.full_name);
-            setPhotoUrl(googleIdentity.identity_data.picture);
-          }
+        // } else {
+        //   const googleIdentity: UserIdentity | undefined = user.identities?.find((identity) => identity.provider === 'google');
+        //   if (googleIdentity !== undefined && googleIdentity.identity_data !== undefined) {
+        //     setDisplayName(googleIdentity.identity_data.full_name);
+        //     setPhotoUrl(googleIdentity.identity_data.picture);
+        //   }
         }
       }
+      setIdentityChecked(true);
     }
     userHelper();
   })
@@ -104,7 +106,15 @@ export function Navbar({children}: {children?: ReactNode}): ReactNode {
 
           {/* Login stuff on right side */}
           <div className="">
-            {loggedIn ? ProfileDropdown(displayName, photoUrl, funcSignOut) : SignIn()}
+            {/* {identityChecked 
+              ? <>{loggedIn ? ProfileDropdown(displayName, photoUrl, funcSignOut) : SignIn()}</> 
+              : <></>
+            } */}
+            <Transition show={identityChecked}>
+              <div className="transition duration-500 ease-in data-[closed]:opacity-0">
+                {loggedIn ? ProfileDropdown(displayName, photoUrl, funcSignOut) : SignIn()}
+              </div>
+            </Transition>
           </div>
 
         </div>
