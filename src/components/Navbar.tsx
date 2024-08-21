@@ -11,16 +11,16 @@ function ProfileDropdown(displayName: string, photoUrl: string, funcSignOut: () 
         <img src={photoUrl} alt="Profile Picture" className="rounded-full h-12 border-2 border-white/10"/>
         {displayName}
       </MenuButton>
-      <MenuItems anchor="bottom end" transition className="flex flex-col font-lg bg-black/50 text-white backdrop-blur-sm p-1 rounded-xl origin-center transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0 [--anchor-gap:8px] min-w-[var(--button-width)]">
-        <MenuItem disabled>
+      <MenuItems anchor="bottom end" transition className="flex flex-col font-lg bg-black/50 text-white backdrop-blur-sm p-1 rounded-xl origin-center transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0 [--anchor-gap:0px] min-w-[var(--button-width)]">
+        {/* <MenuItem disabled>
           <Link to="/profile" className="flex grow items-center rounded-md p-2 gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
             </svg>
             <span className="line-through decoration-2">Profile</span>
           </Link>
-        </MenuItem>
-        <div className="my-1 h-px bg-white/5" />
+        </MenuItem> */}
+        {/* <div className="my-1 h-px bg-white/5" /> */}
         <MenuItem>
           <Button className="flex grow items-center rounded-md hover:bg-white/10 p-2 gap-2" onClick={funcSignOut}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
