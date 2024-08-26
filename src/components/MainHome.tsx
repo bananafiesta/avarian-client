@@ -29,7 +29,7 @@ export function MainHome(): ReactNode {
           </MenuItems>
         </Menu>
       </Navbar>
-      <div className="bg-[url('/rugged_highlands.jpg')] bg-cover bg-[center_top_-5rem] bg-no-repeat flex grow">
+      <div className="bg-[url('/rugged_highlands.jpg')] bg-cover bg-center bg-no-repeat flex grow">
 
       </div>
     </div>
