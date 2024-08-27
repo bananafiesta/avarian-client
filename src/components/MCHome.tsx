@@ -7,7 +7,7 @@ export function MCHome(): ReactNode {
   const title: string = "Mnemonic Spire";
   useDocumentTitle(title);
   return (
-    <div className="h-screen flex flex-col">
+    <div className="flex flex-col grow">
       <div className="h-px bg-gray-300" />
       
       <div className="flex bg-[url('/mc_home.png')] bg-cover bg-center grow">
