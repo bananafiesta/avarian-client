@@ -7,11 +7,11 @@ import { User, UserIdentity } from "@supabase/supabase-js";
 function ProfileDropdown(displayName: string, photoUrl: string, funcSignOut: () => void): ReactNode {
   return (
     <Menu>
-      <MenuButton className="flex hover:bg-white/10 px-3 py-2 rounded-xl text-white items-center gap-2 text-lg">
+      <MenuButton className="flex hover:bg-white/10 px-3 py-2 rounded-md text-white items-center gap-2 text-lg">
         <img src={photoUrl} alt="Profile Picture" className="rounded-full h-12 border-2 border-white/10"/>
         {displayName}
       </MenuButton>
-      <MenuItems anchor="bottom end" transition className="flex flex-col font-lg bg-black/50 text-white backdrop-blur-sm p-1 rounded-xl origin-center transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0 [--anchor-gap:0px] min-w-[var(--button-width)]">
+      <MenuItems anchor="bottom end" transition className="flex flex-col font-lg bg-black/50 text-white backdrop-blur-sm p-1 rounded-md origin-center transition duration-100 ease-out data-[closed]:scale-95 data-[closed]:opacity-0 [--anchor-gap:0px] min-w-[var(--button-width)]">
         {/* <MenuItem disabled>
           <Link to="/profile" className="flex grow items-center rounded-md p-2 gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -22,7 +22,7 @@ function ProfileDropdown(displayName: string, photoUrl: string, funcSignOut: () 
         </MenuItem> */}
         {/* <div className="my-1 h-px bg-white/5" /> */}
         <MenuItem>
-          <Button className="flex grow items-center rounded-md hover:bg-white/10 p-2 gap-2" onClick={funcSignOut}>
+          <Button className="flex grow items-center rounded hover:bg-white/10 p-2 gap-2" onClick={funcSignOut}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
             </svg>
@@ -37,7 +37,7 @@ function ProfileDropdown(displayName: string, photoUrl: string, funcSignOut: () 
 function SignIn(): ReactNode {
   return (
     <Link to="/login/" state={{ prevUrl: `${location.origin}${location.pathname}` }}>
-      <Button className="flex hover:bg-white/10 px-3 py-2 rounded-xl text-white items-center text-lg gap-2">
+      <Button className="flex hover:bg-white/10 px-3 py-2 rounded-md text-white items-center text-lg gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
         </svg>
