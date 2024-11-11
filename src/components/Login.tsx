@@ -37,7 +37,7 @@ export function Login(): ReactNode {
         provider: 'discord',
         options: {
           // redirect to handle backend
-          // redirectTo: process.env.URL_TO_USE + '/auth/callback'
+          // redirectTo: `${process.env.URL_TO_USE}/auth/callback`
           redirectTo: prevUrl
         }
       }).then(() => {
