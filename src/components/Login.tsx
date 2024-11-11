@@ -36,6 +36,8 @@ export function Login(): ReactNode {
       await supabase.auth.signInWithOAuth({
         provider: 'discord',
         options: {
+          // redirect to handle backend
+          // redirectTo: process.env.URL_TO_USE + '/auth/callback'
           redirectTo: prevUrl
         }
       }).then(() => {
