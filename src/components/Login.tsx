@@ -8,7 +8,7 @@ import { supabase } from "./supabase.ts";
 
 
 export function Login(): ReactElement {
-  console.log(import.meta.env.REDIRECT);
+  // console.log(import.meta.env.REDIRECT);
   const title: string = "Sign In";
   useDocumentTitle(title);
 
