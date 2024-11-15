@@ -40,8 +40,9 @@ export function Login(): ReactNode {
         }
       }).then(() => {
 
-      }).catch(() => {
+      }).catch((error) => {
         // deal w/ errors
+        console.log(error)
       })
     }
 
