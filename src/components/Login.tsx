@@ -1,4 +1,4 @@
-import { ReactNode, useCallback} from "react";
+import { ReactElement, useCallback} from "react";
 import {Button} from "@headlessui/react";
 import {useLocation} from "react-router-dom";
 import {useDocumentTitle} from "./useDocumentTitle";
@@ -7,7 +7,7 @@ import { supabase } from "./supabase.ts";
 
 
 
-export function Login(): ReactNode {
+export function Login(): ReactElement {
   console.log(import.meta.env.REDIRECT);
   const title: string = "Sign In";
   useDocumentTitle(title);

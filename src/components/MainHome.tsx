@@ -1,10 +1,10 @@
-import { ReactNode } from "react";
+import { ReactElement } from "react";
 import {Navbar} from "./Navbar";
 import { Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
 import { Link } from "react-router-dom";
 import { useDocumentTitle } from "./useDocumentTitle";
 
-export function MainHome(): ReactNode {
+export function MainHome(): ReactElement {
   const title = "Avarian - Now with less bugs!"
   useDocumentTitle(title);
   return (

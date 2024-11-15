@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { Button, Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react";
-import { useState, ReactNode, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, ReactElement } from "react";
 import { supabase } from "./supabase";
 import { User, UserIdentity } from "@supabase/supabase-js";
 
-function ProfileDropdown(displayName: string, photoUrl: string, funcSignOut: () => void): ReactNode {
+function ProfileDropdown(displayName: string, photoUrl: string, funcSignOut: () => void): ReactElement {
   return (
     <Menu>
       <MenuButton className="flex hover:bg-white/10 px-3 py-2 rounded-md text-white items-center gap-2 text-lg">
@@ -34,7 +34,7 @@ function ProfileDropdown(displayName: string, photoUrl: string, funcSignOut: () 
   )
 }
 
-function SignIn(): ReactNode {
+function SignIn(): ReactElement {
   return (
     <Link to="/login/" state={{ prevUrl: `${location.origin}${location.pathname}` }}>
       <Button className="flex hover:bg-white/10 px-3 py-2 rounded-md text-white items-center text-lg gap-2">
@@ -47,7 +47,7 @@ function SignIn(): ReactNode {
   )
 }
 
-export function Navbar({children}: {children?: ReactNode}): ReactNode {
+export function Navbar({children}: {children?: ReactElement}): ReactElement {
   const [loggedIn, setLoggedIn]: [boolean, (arg0: boolean) => void] = useState(false);
   const [displayName, setDisplayName]: [string, (arg0: string) => void] = useState("");
   const [photoUrl, setPhotoUrl]: [string, (arg0: string) => void] = useState("");

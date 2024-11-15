@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
+import { ReactElement } from "react";
 
-export function Leaderboard(): ReactNode {
+export function Leaderboard(): ReactElement {
   return (
     <></>
   )

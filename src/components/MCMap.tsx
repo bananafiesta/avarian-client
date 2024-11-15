@@ -1,7 +1,7 @@
-import {ReactNode} from "react";
+import {ReactElement} from "react";
 import { useDocumentTitle } from "./useDocumentTitle";
 
-export function MCMap(): ReactNode {
+export function MCMap(): ReactElement {
   const title = "Oracle of Remembrance";
   useDocumentTitle(title);
   return (

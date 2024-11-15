@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
+import { ReactElement } from "react";
 
-export function Profile(): ReactNode {
+export function Profile(): ReactElement {
   return (
     <></>
   )

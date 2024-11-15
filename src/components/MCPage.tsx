@@ -1,9 +1,9 @@
-import { ReactNode } from "react";
+import { ReactElement } from "react";
 import { Navbar } from "./Navbar";
 import { Outlet, Link } from "react-router-dom";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 
-export function MCPage(): ReactNode {
+export function MCPage(): ReactElement {
   return (
     <div className="h-screen flex flex-col">
       <Navbar>
