@@ -19,7 +19,28 @@ function LoadingScreen(): ReactElement {
 function Wallet({economy_obj} : {economy_obj: economy_obj}): ReactElement {
   const uuid = economy_obj.uid;
   const balance = economy_obj.balance;
-  const name = "placeholder"
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    const fetchName = async () => {
+
+      const response = await fetch(`${import.meta.env.VITE_API_ADDRESS}api/mojang/${uuid}`, { method: "GET"});
+      if (!response.ok) {
+        throw new Error(`HTTP error. Status: ${response.status}`);
+      }
+      const json = await response.json();
+      if (!ignore) {
+        setName(json.username);
+      }
+      
+    }
+    let ignore = false;
+    fetchName();
+    return () => {
+      ignore = true;
+    }
+  }, [uuid]);
+
   return (
     <tr className="">
       <td><img src={`https://mc-heads.net/avatar/${uuid}`} alt={name} className="size-8"/></td>
