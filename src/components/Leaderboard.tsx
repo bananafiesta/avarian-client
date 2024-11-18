@@ -19,26 +19,25 @@ function LeaderboardRow({playerJson, count}: {playerJson: playerJson, count: num
   const [name, setName] = useState<string>("Test");
   const uuid = playerJson.player_uuid;
   const total = playerJson.total;
-  // disabled until reverse proxy setup
-  // useEffect(() => {
-  //   const fetchName = async () => {
+  useEffect(() => {
+    const fetchName = async () => {
 
-  //     const response = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`, {mode: "no-cors", method: "GET"});
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error. Status: ${response.status}`);
-  //     }
-  //     const json = await response.json();
-  //     if (!ignore) {
-  //       setName(json.name);
-  //     }
+      const response = await fetch(`${import.meta.env.VITE_API_ADDRESS}api/mojang/${uuid}`, { method: "GET"});
+      if (!response.ok) {
+        throw new Error(`HTTP error. Status: ${response.status}`);
+      }
+      const json = await response.json();
+      if (!ignore) {
+        setName(json.username);
+      }
       
-  //   }
-  //   let ignore = false;
-  //   fetchName();
-  //   return () => {
-  //     ignore = true;
-  //   }
-  // }, [uuid]);
+    }
+    let ignore = false;
+    fetchName();
+    return () => {
+      ignore = true;
+    }
+  }, [uuid]);
   return (
     <tr className="">
       <td>{count}</td>
