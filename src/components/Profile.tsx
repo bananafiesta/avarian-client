@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, useEffect } from "react";
+import { ReactElement, useState, useEffect } from "react";
 import { supabase } from "./supabase";
 
 interface economy_obj {
