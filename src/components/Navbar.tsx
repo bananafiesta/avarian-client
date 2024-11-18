@@ -70,18 +70,11 @@ export function Navbar(): ReactElement {
       if (error === null && data.session !== null) {
         const user: User = data.session.user;
         setLoggedIn(true);
-
-        // Prioritize discord login if multiple identities present
+        
         const discordIdentity: UserIdentity | undefined = user.identities?.find((identity) => identity.provider === 'discord');
         if (discordIdentity !== undefined && discordIdentity.identity_data !== undefined) {
           setDisplayName(discordIdentity.identity_data.full_name);
           setPhotoUrl(discordIdentity.identity_data.picture);
-        // } else {
-        //   const googleIdentity: UserIdentity | undefined = user.identities?.find((identity) => identity.provider === 'google');
-        //   if (googleIdentity !== undefined && googleIdentity.identity_data !== undefined) {
-        //     setDisplayName(googleIdentity.identity_data.full_name);
-        //     setPhotoUrl(googleIdentity.identity_data.picture);
-        //   }
         }
       }
       setIdentityChecked(true);
@@ -123,10 +116,6 @@ export function Navbar(): ReactElement {
 
           {/* Login stuff on right side */}
           <div className="">
-            {/* {identityChecked 
-              ? <>{loggedIn ? ProfileDropdown(displayName, photoUrl, funcSignOut) : SignIn()}</> 
-              : <></>
-            } */}
             <Transition show={identityChecked}>
               <div className="transition duration-500 ease-in data-[closed]:opacity-0">
                 {loggedIn ? ProfileDropdown(displayName, photoUrl, funcSignOut) : SignIn()}
