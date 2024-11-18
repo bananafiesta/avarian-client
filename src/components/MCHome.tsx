@@ -45,7 +45,7 @@ export function MCHome(): ReactElement {
   const title: string = "Title TBD";
   useDocumentTitle(title);
   return (
-    <div className="flex flex-col grow">
+    <>
       <div className="h-px bg-gray-300" />
       
       <div className="flex bg-[url('/mc_home.png')] bg-cover bg-center grow">
@@ -55,7 +55,7 @@ export function MCHome(): ReactElement {
           <CenterButton text="Profile" link="profile" art={<ProfileIcon />} />
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

@@ -8,10 +8,11 @@ import { MCMap } from "./MCMap";
 import { MCPage } from "./MCPage";
 import { Leaderboard } from "./Leaderboard";
 import { Profile } from "./Profile";
+import { BasePage } from "./BasePage";
 
 export function AppRoutes(): ReactNode {
   return (
-    <>
+    <Route path="/" element={<BasePage />}>
       <Route path="/" element={<MainHome />}/>
       <Route path="mc" element={<MCPage />}>
         <Route index element={<MCHome />}/>
@@ -22,6 +23,6 @@ export function AppRoutes(): ReactNode {
       </Route>
       <Route path="login" element={<Login />}/>
       <Route path="*" element={<Navigate to="/" replace={true}/>}/>
-    </>
+    </Route>
   );
 }
