@@ -63,29 +63,7 @@ export function Profile(): ReactElement {
             }
           }
         }
-        // const response = await fetch(`${import.meta.env.VITE_API_ADDRESS}api/profile/wallet`, {
-        //     method: "GET",
-        //     headers: {
-        //       'Authorization' : 
-        //    }
-          
-        //   });
-        // if (!response.ok) {
-        //   throw new Error(`HTTP error. status: ${response.status}`);
-        // } else {
-        //   const json = await response.json();
-        //   const entries = [];
-        //   let count = 1;
-        //   for (const player of json as Array<playerJson>) {
-            
-        //     count++;
-        //   }
-        //   if (!ignore) {
-            
-        //     setLoading(false);
-        //   }
 
-        // }
       } catch (error) {
         console.log(error);
       }
