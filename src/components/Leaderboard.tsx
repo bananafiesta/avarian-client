@@ -1,4 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
+import { Select } from "@headlessui/react";
 
 interface playerJson {
   player_uuid: string,
@@ -49,13 +50,33 @@ function LeaderboardRow({playerJson, count}: {playerJson: playerJson, count: num
   )
 }
 
+function LeaderboardDropdown({skill, setSkill}: {skill: string, setSkill: (arg0: string) => void}): ReactElement {
+  return (
+    <Select value={skill} onChange={option => setSkill(option.target.value)} className="mr-3 text-center font-medium rounded-full bg-gray-100/60 data-[hover]:bg-gray-100/90 w-2/5">
+      <option value="total">Total</option>
+      <option value="agility">Agility</option>
+      <option value="alchemy">Alchemy</option>
+      <option value="archery">Archery</option>
+      <option value="defense">Defense</option>
+      <option value="enchanting">Enchanting</option>
+      <option value="excavation">Excavation</option>
+      <option value="farming">Farming</option>
+      <option value="fighting">Fighting</option>
+      <option value="fishing">Fishing</option>
+      <option value="foraging">Foraging</option>
+      <option value="mining">Mining</option>
+    </Select>
+  )
+}
+
 export function Leaderboard(): ReactElement {
   const [loading, setLoading] = useState(true);
   const [leaderboard, setLeaderboard] = useState<ReactElement[]>([]);
+  const [skill, setSkill] = useState<string>("total");
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_ADDRESS}api/leaderboard`, { method: "GET"});
+        const response = await fetch(`${import.meta.env.VITE_API_ADDRESS}api/leaderboard/${skill}`, { method: "GET"});
         if (!response.ok) {
           throw new Error(`HTTP error. status: ${response.status}`);
         } else {
@@ -81,16 +102,21 @@ export function Leaderboard(): ReactElement {
     return () => {
       ignore = true;
     }
-  }, []);
+  }, [skill]);
   return (
     <div className="flex justify-center items-center grow bg-[url('/mc_home.png')] bg-cover bg-center">
-      <div className="bg-white/50 p-1 rounded-lg">
+      <div className="bg-white/50 py-1 mb-1 rounded-lg">
         {loading 
           ? <LoadingScreen /> 
           : 
+          <>
+          <div className="flex flex-row justify-between mt-1 font-dosis">
+            <p className="px-5 self-end text-xl font-medium">Leaderboard</p>
+            <LeaderboardDropdown skill={skill} setSkill={setSkill} />
+          </div>
           <table className="table-auto border-separate place-items-center border-spacing-x-5 border-spacing-y-4">
             <thead className="">
-              <tr className="">
+              <tr className="font-dosis">
                 <th className="">Rank</th>
                 <th className=""></th>
                 <th className="">Name</th>
@@ -101,6 +127,7 @@ export function Leaderboard(): ReactElement {
               {leaderboard}
             </tbody>
           </table>
+          </>
         }
       </div>
     </div>
