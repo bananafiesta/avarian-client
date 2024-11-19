@@ -7,7 +7,7 @@ import {Login} from "./Login";
 import { MCMap } from "./MCMap";
 import { MCPage } from "./MCPage";
 import { Leaderboard } from "./Leaderboard";
-import { Profile } from "./Profile";
+import { ProfilePage } from "./ProfilePage";
 import { BasePage } from "./BasePage";
 
 export function AppRoutes(): ReactNode {
@@ -18,7 +18,7 @@ export function AppRoutes(): ReactNode {
         <Route index element={<MCHome />}/>
         <Route path="map" element={<MCMap />}/>
         <Route path="leaderboard" element={<Leaderboard />}/>
-        <Route path="profile" element={<Profile />}/>
+        <Route path="profile" element={<ProfilePage />}/>
         <Route path="*" element={<Navigate to="" replace />}/>
       </Route>
       <Route path="login" element={<Login />}/>

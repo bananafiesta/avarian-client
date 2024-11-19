@@ -6,6 +6,12 @@ interface economy_obj {
   uid: string
 }
 
+enum status {
+  Loading,
+  Done,
+  NotFound,
+}
+
 function LoadingScreen(): ReactElement {
   return (
     <div className="flex">
@@ -15,6 +21,44 @@ function LoadingScreen(): ReactElement {
     </svg>
     </div>
   )
+}
+
+function NotFoundScreen(): ReactElement {
+  return (
+    <div className="flex">
+      <p>No associated accounts found. Please log in or request for your account to be linked.</p>
+    </div>
+  )
+}
+
+function Profile({wallets}: {wallets: ReactElement[]}): ReactElement {
+  return (
+    <table className="table-auto border-separate place-items-center border-spacing-x-5 border-spacing-y-4">
+      <thead className="">
+        <tr className="font-semibold">
+          <th className=""></th>
+          <th className="">Name</th>
+          <th className="">Balance</th>
+        </tr>
+      </thead>
+      <tbody className="font-dosis text-lg font-semibold text-center">
+        {wallets}
+      </tbody>
+    </table>
+  )
+}
+
+function statusSwitch(currentStatus: status, wallets: ReactElement[]): ReactElement {
+  switch (currentStatus) {
+    case status.Loading:
+      return <LoadingScreen />
+    case status.Done:
+      return (
+        <Profile wallets={wallets} />
+      )
+    default:
+      return <NotFoundScreen />
+  }
 }
 
 function Wallet({economy_obj} : {economy_obj: economy_obj}): ReactElement {
@@ -51,8 +95,8 @@ function Wallet({economy_obj} : {economy_obj: economy_obj}): ReactElement {
   )
 }
 
-export function Profile(): ReactElement {
-  const [loading, setLoading] = useState(true);
+export function ProfilePage(): ReactElement {
+  const [loading, setLoading] = useState<status>(status.Loading);
   const [wallets, setWallets] = useState<ReactElement[]>([]);
 
   useEffect(() => {
@@ -82,10 +126,16 @@ export function Profile(): ReactElement {
               count++;
             }
             if (!ignore) {
-              setWallets(entries);
-              setLoading(false);
+              if (count > 1) {
+                setWallets(entries);
+                setLoading(status.Done);
+              } else {
+                setLoading(status.NotFound)
+              }
             }
           }
+        } else {
+          setLoading(status.NotFound);
         }
 
       } catch (error) {
@@ -103,22 +153,7 @@ export function Profile(): ReactElement {
   return (
     <div className="flex justify-center items-center grow bg-[url('/mc_home.png')] bg-cover bg-center">
       <div className="bg-white/50 p-1 rounded-lg">
-        {loading 
-          ? <LoadingScreen /> 
-          : 
-          <table className="table-auto border-separate place-items-center border-spacing-x-5 border-spacing-y-4">
-            <thead className="">
-              <tr className="font-semibold">
-                <th className=""></th>
-                <th className="">Name</th>
-                <th className="">Balance</th>
-              </tr>
-            </thead>
-            <tbody className="font-dosis text-lg font-semibold text-center">
-              {wallets}
-            </tbody>
-          </table>
-        }
+        {statusSwitch(loading, wallets)}
       </div>
     </div>
   )
