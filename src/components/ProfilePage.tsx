@@ -20,7 +20,7 @@ async function fetchWallet(accessToken: string): Promise<Array<economy_obj>> {
   const response = await fetch(`${import.meta.env.VITE_API_ADDRESS}api/profile/wallet`, {
     method: "GET",
     headers: {
-      'Authorization' : accessToken
+      'Authorization' : `Bearer ${accessToken}`
     }
   });
   if (!response.ok) {
@@ -106,8 +106,8 @@ function Wallet({economy_obj} : {economy_obj: economy_obj}): ReactElement {
 export function ProfilePage(): ReactElement {
   const [loading, setLoading] = useState<status>(status.Loading);
   const [wallets, setWallets] = useState<ReactElement[]>([]);
-
   const [session, setSession] = useState<Session | null>(null);
+
 
   useEffect(() => {
     const fetchSession = async () => {
