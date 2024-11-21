@@ -1,5 +1,8 @@
 import { ReactElement, useState, useEffect } from "react";
 import { supabase } from "./supabase";
+import { useQuery } from "@tanstack/react-query";
+import { Session, AuthChangeEvent } from "@supabase/supabase-js";
+import { fetchName } from "../utils/fetching";
 
 interface economy_obj {
   balance: number,
@@ -10,15 +13,29 @@ enum status {
   Loading,
   Done,
   NotFound,
+  Error
+}
+
+async function fetchWallet(accessToken: string): Promise<Array<economy_obj>> {
+  const response = await fetch(`${import.meta.env.VITE_API_ADDRESS}api/profile/wallet`, {
+    method: "GET",
+    headers: {
+      'Authorization' : accessToken
+    }
+  });
+  if (!response.ok) {
+    throw new Error(`Network response was not ok`);
+  }
+  return response.json();
 }
 
 function LoadingScreen(): ReactElement {
   return (
-    <div className="flex">
+    <div className="flex grow justify-center items-center">
       <svg className="animate-spin size-16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-    </svg>
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
     </div>
   )
 }
@@ -48,13 +65,17 @@ function Profile({wallets}: {wallets: ReactElement[]}): ReactElement {
   )
 }
 
-function statusSwitch(currentStatus: status, wallets: ReactElement[]): ReactElement {
+function statusSwitch(currentStatus: status, wallets: Array<ReactElement>): ReactElement {
   switch (currentStatus) {
     case status.Loading:
       return <LoadingScreen />
     case status.Done:
       return (
         <Profile wallets={wallets} />
+      )
+    case status.Error:
+      return (
+        <span>Error detected. Check console for more details.</span>
       )
     default:
       return <NotFoundScreen />
@@ -66,25 +87,12 @@ function Wallet({economy_obj} : {economy_obj: economy_obj}): ReactElement {
   const balance = economy_obj.balance;
   const [name, setName] = useState<string>("-");
 
+  const result = useQuery({queryKey: ['mc_uuid', uuid], queryFn: () => fetchName(uuid), staleTime: 1000*60*5});
   useEffect(() => {
-    const fetchName = async () => {
-
-      const response = await fetch(`${import.meta.env.VITE_API_ADDRESS}api/mojang/${uuid}`, { method: "GET"});
-      if (!response.ok) {
-        throw new Error(`HTTP error. Status: ${response.status}`);
-      }
-      const json = await response.json();
-      if (!ignore) {
-        setName(json.username);
-      }
-      
+    if (!result.isPending && !result.isError) {
+      setName(result.data.username);
     }
-    let ignore = false;
-    fetchName();
-    return () => {
-      ignore = true;
-    }
-  }, [uuid]);
+  }, [result])
 
   return (
     <tr className="">
@@ -99,56 +107,57 @@ export function ProfilePage(): ReactElement {
   const [loading, setLoading] = useState<status>(status.Loading);
   const [wallets, setWallets] = useState<ReactElement[]>([]);
 
+  const [session, setSession] = useState<Session | null>(null);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const {data, error} = await supabase.auth.getSession();
-        if (error) {
-          throw error;
-        }
-        if (data.session?.access_token) {
-          const response = await fetch(`${import.meta.env.VITE_API_ADDRESS}api/profile/wallet`, {
-            method: "GET",
-            headers: {
-              'Authorization' : data.session.access_token
-           }
-          
-          });
-          if (!response.ok) {
-            throw new Error(`HTTP error. status: ${response.status}`);
-          } else {
-            const json = await response.json();
-            const entries = [];
-            let count = 1;
-          
-            for (const wallet of json as Array<economy_obj>) {
-              entries.push(<Wallet economy_obj={wallet} key={count} />)
-              count++;
-            }
-            if (!ignore) {
-              if (count > 1) {
-                setWallets(entries);
-                setLoading(status.Done);
-              } else {
-                setLoading(status.NotFound)
-              }
-            }
-          }
-        } else {
-          setLoading(status.NotFound);
-        }
-
-      } catch (error) {
-        console.log(error);
+    const fetchSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        throw error;
       }
+      setSession(data.session);
     };
-    let ignore = false;
-    fetchData();
-    return () => {
-      ignore = true;
-    }
+    fetchSession();
+    const { data } = supabase.auth.onAuthStateChange(
+      (_event: AuthChangeEvent, updatedSession: Session | null) => {
+        setSession(updatedSession);
+      }
+    );
+    return () => {data.subscription.unsubscribe()};
   }, []);
+  let accessToken = "";
+  if (session?.access_token) {
+    accessToken = session.access_token;
+  }
+  const result = useQuery({
+    queryKey: ['wallets', accessToken],
+    queryFn: () => fetchWallet(accessToken),
+    staleTime: 1000 * 60,
+    enabled: !!accessToken
+  })
 
+  useEffect(() => {
+    if (!accessToken) {
+      setLoading(status.NotFound)
+    } else if (result.error) {
+      console.log(result.error);
+      setLoading(status.Error);
+    } else if (!result.isPending) {
+      const entries = []
+      let count = 1
+      for (const wallet of result.data as Array<economy_obj>) {
+        entries.push(<Wallet economy_obj={wallet} key={count} />);
+        count++;
+      }
+      if (count > 1) {
+        setWallets(entries);
+        setLoading(status.Done);
+      } else {
+        setLoading(status.NotFound);
+      }
+    }
+
+  }, [result.error, result.isPending, result.data, accessToken]);
 
   return (
     <div className="flex justify-center items-center grow bg-[url('/mc_home.png')] bg-cover bg-center">
