@@ -4,11 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { fetchName } from "../utils/fetching";
 
-interface economy_obj {
-  balance: number,
-  uid: string
-}
-
 enum status {
   Loading,
   Done,
@@ -31,19 +26,6 @@ interface profileData {
   foraging: number,
   mining: number,
   total: number,
-}
-
-async function fetchWallet(accessToken: string): Promise<Array<economy_obj>> {
-  const response = await fetch(`${import.meta.env.VITE_API_ADDRESS}api/profile/wallet`, {
-    method: "GET",
-    headers: {
-      'Authorization': `Bearer ${accessToken}`
-    }
-  });
-  if (!response.ok) {
-    throw new Error(`Network response was not ok`);
-  }
-  return response.json();
 }
 
 async function fetchProfiles(accessToken: string): Promise<Array<profileData>> {
@@ -117,18 +99,6 @@ function Profile({data}: {data: profileData}): ReactElement {
         <p>Mining: {data.mining}</p>
       </div>
     </div>
-    // <table className="table-auto border-separate place-items-center border-spacing-x-5 border-spacing-y-4">
-    //   <thead className="">
-    //     <tr className="font-semibold">
-    //       <th className=""></th>
-    //       <th className="">Name</th>
-    //       <th className="">Balance</th>
-    //     </tr>
-    //   </thead>
-    //   <tbody className="font-dosis text-lg font-semibold text-center">
-    //     {wallets}
-    //   </tbody>
-    // </table>
   )
 }
 
@@ -157,27 +127,6 @@ function StatusSwitch({currentStatus, profiles}: {currentStatus: status, profile
     default:
       return <NotFoundScreen />
   }
-}
-
-function Wallet({economy_obj} : {economy_obj: economy_obj}): ReactElement {
-  const uuid = economy_obj.uid;
-  const balance = economy_obj.balance;
-  const [name, setName] = useState<string>("-");
-
-  const result = useQuery({queryKey: ['mc_uuid', uuid], queryFn: () => fetchName(uuid), staleTime: 1000*60*5});
-  useEffect(() => {
-    if (!result.isPending && !result.isError) {
-      setName(result.data.username);
-    }
-  }, [result])
-
-  return (
-    <tr className="">
-      <td><img src={`https://mc-heads.net/avatar/${uuid}`} alt={name} className="size-8 border border-gray-400/50"/></td>
-      <td>{name}</td>
-      <td>${balance}</td>
-    </tr>
-  )
 }
 
 export function ProfilePage(): ReactElement {
