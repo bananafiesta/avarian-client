@@ -40,7 +40,7 @@ async function fetchName(uuid: string) {
 
 function LoadingScreen(): ReactElement {
   return (
-    <div className="flex grow justify-center">
+    <div className="flex grow justify-center items-center">
       <svg className="animate-spin size-16" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -78,7 +78,7 @@ function LeaderboardTable({leaderboardMap}: {leaderboardMap: Map<string, UseQuer
   }
   return (
     <>
-    <div className="flex flex-row justify-between mt-1 font-dosis">
+    <div className="flex flex-row w-2/3 justify-between mt-1 font-dosis">
       <p className="px-5 self-end text-xl font-medium">Leaderboard</p>
       <LeaderboardDropdown skill={skill} setSkill={setSkill} />
     </div>
@@ -102,25 +102,27 @@ function LeaderboardLoader({currentQuery}: {currentQuery: UseQueryResult}): Reac
     count++;
   }
   return (
-  <table className="table-auto border-separate place-items-center border-spacing-x-5 border-spacing-y-4">
-    <thead className="">
-      <tr className="font-dosis">
-        <th className="">Rank</th>
-        <th className=""></th>
-        <th className="">Name</th>
-        <th className="">Levels</th>
-      </tr>
-    </thead>
-    <tbody className="text-lg font-dosis font-semibold text-center">
-      {entries}
-    </tbody>
-  </table>
+    <div className="overflow-y-auto h-screen">
+      <table className="table-auto border-separate place-items-center border-spacing-x-5 border-spacing-y-4">
+        <thead className="">
+          <tr className="font-dosis">
+            <th className="">Rank</th>
+            <th className=""></th>
+            <th className="">Name</th>
+            <th className="">Levels</th>
+          </tr>
+        </thead>
+        <tbody className="text-lg font-dosis font-semibold text-center">
+          {entries}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
 function LeaderboardDropdown({skill, setSkill}: {skill: string, setSkill: (arg0: string) => void}): ReactElement {
   return (
-    <Select value={skill} onChange={option => setSkill(option.target.value)} className="mr-3 text-center font-medium rounded-full bg-gray-100/60 data-[hover]:bg-gray-100/90 w-2/5">
+    <Select value={skill} onChange={option => setSkill(option.target.value)} className="mr-4 text-center font-medium rounded-full bg-gray-100/60 data-[hover]:bg-gray-100/90 w-2/5">
       <option value="total">Total</option>
       <option value="agility">Agility</option>
       <option value="alchemy">Alchemy</option>
@@ -137,8 +139,9 @@ function LeaderboardDropdown({skill, setSkill}: {skill: string, setSkill: (arg0:
   )
 }
 
+const leaderboardMap = new Map();
+
 export function Leaderboard(): ReactElement {
-  const [leaderboards, setLeaderboards] = useState<Map<string, UseQueryResult>>(new Map());
 
   const leaderboardQueries = useQueries({
     queries: skills.map((skill) => {
@@ -149,19 +152,15 @@ export function Leaderboard(): ReactElement {
       }
     })
   })
-  useEffect(() => {
-    const leaderboardMap = new Map();
-    for (let i = 0; i < skills.length; i++) {
-      leaderboardMap.set(skills[i], leaderboardQueries[i])
-    }
-    setLeaderboards(leaderboardMap);
-  
-  }, [leaderboardQueries])
+
+  for (let i = 0; i < skills.length; i++) {
+    leaderboardMap.set(skills[i], leaderboardQueries[i])
+  }
 
   return (
-    <div className="flex justify-center items-center grow bg-[url('/mc_home.png')] bg-cover bg-center">
-      <div className="bg-white/50 py-1 mb-1 rounded-lg">
-        <LeaderboardTable leaderboardMap={leaderboards} />
+    <div className="flex justify-center items-center grow bg-[url('/mc_home.png')] bg-cover bg-center relative">
+      <div className="bg-gray-300/50 mb-1 rounded-lg flex flex-col items-center absolute top-[2%] bottom-[5%] px-5 md:w-1/3 min-w-80">
+        <LeaderboardTable leaderboardMap={leaderboardMap} />
       </div>
     </div>
   )
