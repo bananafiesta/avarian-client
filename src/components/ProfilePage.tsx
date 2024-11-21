@@ -16,15 +16,45 @@ enum status {
   Error
 }
 
+interface profileData {
+  uuid: string,
+  balance: number,
+  agility: number,
+  alchemy: number,
+  archery: number,
+  defense: number,
+  enchanting: number,
+  excavation: number,
+  farming: number,
+  fighting: number,
+  fishing: number,
+  foraging: number,
+  mining: number,
+  total: number,
+}
+
 async function fetchWallet(accessToken: string): Promise<Array<economy_obj>> {
   const response = await fetch(`${import.meta.env.VITE_API_ADDRESS}api/profile/wallet`, {
     method: "GET",
     headers: {
-      'Authorization' : `Bearer ${accessToken}`
+      'Authorization': `Bearer ${accessToken}`
     }
   });
   if (!response.ok) {
     throw new Error(`Network response was not ok`);
+  }
+  return response.json();
+}
+
+async function fetchProfiles(accessToken: string): Promise<Array<profileData>> {
+  const response = await fetch(`${import.meta.env.VITE_API_ADDRESS}api/profile/all`, {
+    method: "GET",
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
   }
   return response.json();
 }
@@ -48,30 +78,77 @@ function NotFoundScreen(): ReactElement {
   )
 }
 
-function Profile({wallets}: {wallets: ReactElement[]}): ReactElement {
+function Profile({data}: {data: profileData}): ReactElement {
+  const [name, setName] = useState<string>("-");
+
+  const result = useQuery({queryKey: ['mc_uuid', data.uuid], queryFn: () => fetchName(data.uuid), staleTime: 1000*60*5});
+  useEffect(() => {
+    if (!result.isPending && !result.isError) {
+      setName(result.data.username);
+    }
+  }, [result])
   return (
-    <table className="table-auto border-separate place-items-center border-spacing-x-5 border-spacing-y-4">
-      <thead className="">
-        <tr className="font-semibold">
-          <th className=""></th>
-          <th className="">Name</th>
-          <th className="">Balance</th>
-        </tr>
-      </thead>
-      <tbody className="font-dosis text-lg font-semibold text-center">
-        {wallets}
-      </tbody>
-    </table>
+    <div className="flex flex-col">
+      {/* identifying info */}
+      <div className="flex flex-row items-center gap-5">
+        <img src={`https://mc-heads.net/head/${data.uuid}`} alt={`${name}`} className="size-32" />
+        <span className="text-2xl">{name}</span>
+      </div>
+      {/* Stats */}
+      <div className="text-xl select-none font-dosis font-semibold flex grow flex-col content-between">
+        <p className="flex flex-row items-center gap-2">
+          <span>Balance:</span>
+          <div className="flex flex-row items-center">
+            {data.balance}
+            <img src="/Ether_drop_icon.png" title="Ether Drop" alt="Ether Drop" className="size-8"/>
+          </div>
+        </p>
+        <p className=""><span>Total:</span> {data.total}</p>
+        <p>Agility: {data.agility}</p>
+        <p>Alchemy: {data.alchemy}</p>
+        <p>Archery: {data.archery}</p>
+        <p>Defense: {data.defense}</p>
+        <p>Enchanting: {data.enchanting}</p>
+        <p>Excavation: {data.excavation}</p>
+        <p>Farming: {data.farming}</p>
+        <p>Fighting: {data.fighting}</p>
+        <p>Fishing: {data.fishing}</p>
+        <p>Foraging: {data.foraging}</p>
+        <p>Mining: {data.mining}</p>
+      </div>
+    </div>
+    // <table className="table-auto border-separate place-items-center border-spacing-x-5 border-spacing-y-4">
+    //   <thead className="">
+    //     <tr className="font-semibold">
+    //       <th className=""></th>
+    //       <th className="">Name</th>
+    //       <th className="">Balance</th>
+    //     </tr>
+    //   </thead>
+    //   <tbody className="font-dosis text-lg font-semibold text-center">
+    //     {wallets}
+    //   </tbody>
+    // </table>
   )
 }
 
-function statusSwitch(currentStatus: status, wallets: Array<ReactElement>): ReactElement {
+function StatusSwitch({currentStatus, profiles}: {currentStatus: status, profiles: Array<profileData>}): ReactElement {
+  const [index, setIndex] = useState(-1);
+  const [uuid, setUuid] = useState("");
   switch (currentStatus) {
     case status.Loading:
       return <LoadingScreen />
     case status.Done:
+      if (index == -1 || index >= profiles.length || profiles[index].uuid !== uuid) {
+        setIndex(0);
+        setUuid(profiles[0].uuid);
+      }
+
       return (
-        <Profile wallets={wallets} />
+        <div className="flex flex-row">
+          <Profile data={profiles[index]} />
+        </div>
+
       )
     case status.Error:
       return (
@@ -105,9 +182,8 @@ function Wallet({economy_obj} : {economy_obj: economy_obj}): ReactElement {
 
 export function ProfilePage(): ReactElement {
   const [loading, setLoading] = useState<status>(status.Loading);
-  const [wallets, setWallets] = useState<ReactElement[]>([]);
   const [session, setSession] = useState<Session | null>(null);
-
+  const [profiles, setProfiles] = useState<profileData[]>([]);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -130,8 +206,8 @@ export function ProfilePage(): ReactElement {
     accessToken = session.access_token;
   }
   const result = useQuery({
-    queryKey: ['wallets', accessToken],
-    queryFn: () => fetchWallet(accessToken),
+    queryKey: ['profiles', accessToken],
+    queryFn: () => fetchProfiles(accessToken),
     staleTime: 1000 * 60,
     enabled: !!accessToken
   })
@@ -143,14 +219,8 @@ export function ProfilePage(): ReactElement {
       console.log(result.error);
       setLoading(status.Error);
     } else if (!result.isPending) {
-      const entries = []
-      let count = 1
-      for (const wallet of result.data as Array<economy_obj>) {
-        entries.push(<Wallet economy_obj={wallet} key={count} />);
-        count++;
-      }
-      if (count > 1) {
-        setWallets(entries);
+      setProfiles(result.data);
+      if (result.data.length > 0) {
         setLoading(status.Done);
       } else {
         setLoading(status.NotFound);
@@ -162,7 +232,7 @@ export function ProfilePage(): ReactElement {
   return (
     <div className="flex justify-center items-center grow bg-[url('/mc_home.png')] bg-cover bg-center">
       <div className="bg-white/50 p-1 rounded-lg">
-        {statusSwitch(loading, wallets)}
+        <StatusSwitch currentStatus={loading} profiles={profiles} />
       </div>
     </div>
   )
