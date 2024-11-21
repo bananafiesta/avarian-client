@@ -162,9 +162,7 @@ export function ProfilePage(): ReactElement {
   })
 
   useEffect(() => {
-    if (!accessToken) {
-      setLoading(status.NotFound)
-    } else if (result.error) {
+    if (result.error) {
       console.log(result.error);
       setLoading(status.Error);
     } else if (!result.isPending) {
