@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { fetchName } from "../utils/fetching";
 import { skills } from "../utils/auraskills";
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react";
 
 enum status {
   Loading,
@@ -70,15 +71,10 @@ function Profile({data}: {data: profileData}): ReactElement {
     if (!result.isPending && !result.isError) {
       setName(result.data.username);
     }
-  }, [result])
+  }, [result.isPending, result.isError, result.data])
   const skillComponent = [];
-  let ignoreFlag = true;
   for (const skill of skills) {
-    if (ignoreFlag) {
-      ignoreFlag = false;
-    } else {
-      skillComponent.push(<div className="h-px bg-gray-300" />)
-    }
+    skillComponent.push(<div className="h-px bg-gray-300" />)
     const temp = (
       <div className="flex flex-row justify-between">
         <p>{skill.charAt(0).toUpperCase() + skill.slice(1)}:</p>
@@ -88,10 +84,10 @@ function Profile({data}: {data: profileData}): ReactElement {
     skillComponent.push(temp);
   }
   return (
-    <div className="flex flex-col text-white bg-gray-700/70 p-1 rounded-lg mt-5">
+    <div className="flex flex-col text-white bg-gray-700/70 p-1 rounded-lg mt-1">
       {/* identifying info */}
-      <div className="flex flex-row items-center gap-5">
-        <img src={`https://mc-heads.net/head/${data.uuid}`} alt={`${name}`} className="size-32" />
+      <div className="flex flex-row grow items-center gap-5 mx-3">
+        <img src={`https://mc-heads.net/head/${data.uuid}`} alt={`${name}`} className="size-24 md:size-32" />
         <div className="flex flex-col font-nunito">
           <span className="text-2xl font-semibold">{name}</span>
           <p className="flex flex-row items-center gap-2 text-xl">
@@ -106,21 +102,50 @@ function Profile({data}: {data: profileData}): ReactElement {
       </div>
       {/* Stats */}
       <div className="text-sm md:text-xl select-none font-nunito font-semibold flex grow flex-col content-between">
-
+        <p className="text-center mt-1">Skills</p>
         {skillComponent}
-        {/* <p>Agility: {data.agility}</p>
-        <p>Alchemy: {data.alchemy}</p>
-        <p>Archery: {data.archery}</p>
-        <p>Defense: {data.defense}</p>
-        <p>Enchanting: {data.enchanting}</p>
-        <p>Excavation: {data.excavation}</p>
-        <p>Farming: {data.farming}</p>
-        <p>Fighting: {data.fighting}</p>
-        <p>Fishing: {data.fishing}</p>
-        <p>Foraging: {data.foraging}</p>
-        <p>Mining: {data.mining}</p> */}
       </div>
     </div>
+  )
+}
+
+function ProfileDropdown({profiles, index, setIndex}: {profiles: Array<profileData>, index: number, setIndex: (arg0: number) => (void)}): ReactElement{
+  let count = 0;
+  return (
+  <>
+  <Listbox value={index} onChange={setIndex}>
+    <ListboxButton className="bg-gray-700/70 rounded-xl mb-1 flex flex-row justify-between font-nunito text-white items-center px-2 text-lg hover:bg-gray-700/50">
+      Select account ...
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+      </svg>
+
+    </ListboxButton>
+    <ListboxOptions transition anchor="bottom start" className="w-[var(--button-width)] border border-gray-500/5 [--anchor-gap:2px] rounded-xl transition ease-in duration-150 data-[closed]:opacity-0 bg-gray-600 p-1">
+      {profiles.map((profile) => (
+        <ListboxOption key={profile.uuid} value={count++} className="flex flex-row font-nunito text-white items-center gap-4 px-2 data-[focus]:bg-white/10 rounded-xl">
+          <DropdownRow profile={profile}/>
+        </ListboxOption>
+      ))}
+    </ListboxOptions>
+  </Listbox>
+  </>
+)
+}
+
+function DropdownRow({profile}: {profile: profileData}): ReactElement {
+  const [name, setName] = useState('-');
+  const result = useQuery({queryKey: ['mc_uuid', profile.uuid], queryFn: () => fetchName(profile.uuid), staleTime: 1000*60*5});
+  useEffect(() => {
+    if (!result.isPending && !result.isError) {
+      setName(result.data.username);
+    }
+  }, [result.isPending, result.isError, result.data])
+  return (
+      <>
+      <img src={`https://mc-heads.net/head/${profile.uuid}`} alt={`${name}`} className="size-12" />
+      {name}
+      </>
   )
 }
 
@@ -137,7 +162,9 @@ function StatusSwitch({currentStatus, profiles}: {currentStatus: status, profile
       }
 
       return (
-        <div className="flex flex-row">
+        <div className="flex flex-col">
+          {/* {profiles.length > 1 ? <ProfileDropdown profiles={profiles} index={index} setIndex={setIndex} /> : <></>} */}
+          <ProfileDropdown profiles={profiles} index={index} setIndex={setIndex} />
           <Profile data={profiles[index]} />
         </div>
 
