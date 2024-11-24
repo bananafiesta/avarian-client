@@ -4,7 +4,7 @@ import { Outlet, ScrollRestoration } from "react-router-dom";
 
 export function BasePage(): ReactElement {
   return (
-    <div className="min-h-dvh flex flex-col w-dvw">
+    <div className="min-h-screen flex flex-col max-h-screen overflow-hidden">
       <Navbar />
       <ScrollRestoration />
       <Outlet />

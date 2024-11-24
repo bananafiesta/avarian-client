@@ -3,6 +3,7 @@ import { supabase } from "./supabase";
 import { useQuery } from "@tanstack/react-query";
 import { Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { fetchName } from "../utils/fetching";
+import { skills } from "../utils/auraskills";
 
 enum status {
   Loading,
@@ -12,6 +13,7 @@ enum status {
 }
 
 interface profileData {
+  [index: string]: string | number;
   uuid: string,
   balance: number,
   agility: number,
@@ -69,24 +71,44 @@ function Profile({data}: {data: profileData}): ReactElement {
       setName(result.data.username);
     }
   }, [result])
+  const skillComponent = [];
+  let ignoreFlag = true;
+  for (const skill of skills) {
+    if (ignoreFlag) {
+      ignoreFlag = false;
+    } else {
+      skillComponent.push(<div className="h-px bg-gray-300" />)
+    }
+    const temp = (
+      <div className="flex flex-row justify-between">
+        <p>{skill.charAt(0).toUpperCase() + skill.slice(1)}:</p>
+        <p>{data[skill]}</p>
+      </div>
+    )
+    skillComponent.push(temp);
+  }
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col text-white bg-gray-700/70 p-1 rounded-lg mt-5">
       {/* identifying info */}
       <div className="flex flex-row items-center gap-5">
         <img src={`https://mc-heads.net/head/${data.uuid}`} alt={`${name}`} className="size-32" />
-        <span className="text-2xl">{name}</span>
+        <div className="flex flex-col font-nunito">
+          <span className="text-2xl font-semibold">{name}</span>
+          <p className="flex flex-row items-center gap-2 text-xl">
+            <span>Balance:</span>
+            <div className="flex flex-row items-center gap-0.5">
+              {data.balance}
+              <img src="/Ether_drop_icon.png" title="Ether Drop" alt="Ether Drop" className="size-6 md:size-8"/>
+            </div>
+          </p>
+          <p className=""><span>Level:</span> {data.total}</p>
+        </div>
       </div>
       {/* Stats */}
-      <div className="text-xl select-none font-dosis font-semibold flex grow flex-col content-between">
-        <p className="flex flex-row items-center gap-2">
-          <span>Balance:</span>
-          <div className="flex flex-row items-center">
-            {data.balance}
-            <img src="/Ether_drop_icon.png" title="Ether Drop" alt="Ether Drop" className="size-8"/>
-          </div>
-        </p>
-        <p className=""><span>Total:</span> {data.total}</p>
-        <p>Agility: {data.agility}</p>
+      <div className="text-sm md:text-xl select-none font-nunito font-semibold flex grow flex-col content-between">
+
+        {skillComponent}
+        {/* <p>Agility: {data.agility}</p>
         <p>Alchemy: {data.alchemy}</p>
         <p>Archery: {data.archery}</p>
         <p>Defense: {data.defense}</p>
@@ -96,7 +118,7 @@ function Profile({data}: {data: profileData}): ReactElement {
         <p>Fighting: {data.fighting}</p>
         <p>Fishing: {data.fishing}</p>
         <p>Foraging: {data.foraging}</p>
-        <p>Mining: {data.mining}</p>
+        <p>Mining: {data.mining}</p> */}
       </div>
     </div>
   )
@@ -177,10 +199,8 @@ export function ProfilePage(): ReactElement {
   }, [result.error, result.isPending, result.data, accessToken]);
 
   return (
-    <div className="flex justify-center items-center grow bg-[url('/mc_home.png')] bg-cover bg-center">
-      <div className="bg-white/50 p-1 rounded-lg">
-        <StatusSwitch currentStatus={loading} profiles={profiles} />
-      </div>
+    <div className="flex justify-center items-center grow bg-[url('/mc_home.png')] bg-cover bg-center w-screen h-full">
+      <StatusSwitch currentStatus={loading} profiles={profiles} />
     </div>
   )
 }
