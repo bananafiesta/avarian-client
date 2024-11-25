@@ -59,7 +59,7 @@ function LoadingScreen(): ReactElement {
 
 function NotFoundScreen(): ReactElement {
   return (
-    <div className="flex">
+    <div className="flex bg-gray-700/70 text-white font-nunito">
       <p>No associated accounts found. Please log in or request for your account to be linked.</p>
     </div>
   )
@@ -75,10 +75,11 @@ function Profile({data}: {data: profileData}): ReactElement {
     }
   }, [result.isPending, result.isError, result.data])
   const skillComponent = [];
+  let count = 0;
   for (const skill of skills) {
-    skillComponent.push(<div className="h-px bg-gray-300" />)
+    skillComponent.push(<div className="h-px bg-gray-300" key={count++}/>)
     const temp = (
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-row justify-between" key={count++}>
         <p>{skill.charAt(0).toUpperCase() + skill.slice(1)}:</p>
         <p>{data[skill]}</p>
       </div>
@@ -92,14 +93,14 @@ function Profile({data}: {data: profileData}): ReactElement {
         <img src={`https://mc-heads.net/head/${data.uuid}`} alt={`${name}`} className="size-24 md:size-32" />
         <div className="flex flex-col font-nunito">
           <span className="text-2xl font-semibold">{name}</span>
-          <p className="flex flex-row items-center gap-2 text-xl">
+          <div className="flex flex-row items-center gap-2 text-xl">
             <span>Balance:</span>
             <div className="flex flex-row items-center gap-0.5">
               {data.balance}
               <img src="/Ether_drop_icon.png" title="Ether Drop" alt="Ether Drop" className="size-6 md:size-8"/>
             </div>
-          </p>
-          <p className=""><span>Level:</span> {data.total}</p>
+          </div>
+          <div className=""><span>Level:</span> {data.total}</div>
         </div>
       </div>
       {/* Stats */}
@@ -118,7 +119,7 @@ function ProfileDropdown({profiles, index, setIndex}: {profiles: Array<profileDa
   <Listbox value={index} onChange={setIndex}>
     <ListboxButton className="bg-gray-700/70 rounded-xl mb-1 flex flex-row justify-between font-nunito text-white items-center px-2 text-lg hover:bg-gray-700/50">
       Select account ...
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
         <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
       </svg>
 
@@ -186,6 +187,7 @@ export function ProfilePage(): ReactElement {
   const [loading, setLoading] = useState<status>(status.Loading);
   const [session, setSession] = useState<Session | null>(null);
   const [profiles, setProfiles] = useState<profileData[]>([]);
+  const [initFlag, setInitFlag] = useState(true);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -194,6 +196,7 @@ export function ProfilePage(): ReactElement {
         throw error;
       }
       setSession(data.session);
+      setInitFlag(false);
     };
     fetchSession();
     const { data } = supabase.auth.onAuthStateChange(
@@ -215,7 +218,9 @@ export function ProfilePage(): ReactElement {
   })
 
   useEffect(() => {
-    if (result.error) {
+    if (!session && !initFlag) {
+      setLoading(status.NotFound);
+    } else if (result.error) {
       console.log(result.error);
       setLoading(status.Error);
     } else if (!result.isPending) {
@@ -227,7 +232,7 @@ export function ProfilePage(): ReactElement {
       }
     }
 
-  }, [result.error, result.isPending, result.data, accessToken]);
+  }, [result.error, result.isPending, result.data, session, initFlag]);
 
   return (
     <div className="flex justify-center items-center grow bg-[url('/mc_home.png')] bg-cover bg-center w-screen h-full">
