@@ -7,7 +7,7 @@ export function MCMap(): ReactElement {
   return (
     <>
       <div className="h-px bg-gray-300" />
-      <iframe src="https://avarian.net" title="map" className="flex grow"></iframe>
+      <iframe src="https://map.avarian.net" title="map" className="flex grow"></iframe>
 
     </>
   )
